@@ -243,7 +243,7 @@ class AddUserPage extends Component
                 'bank'           => $this->bank ? $this->bank : null,
                 'iban'           => $this->iban ? $this->iban : null,
                 'bic'            => $this->bic ? $this->bic : null,
-                'ust_idnr'       => $this->ust_idnr ? $this->ust_idnr : null,
+                // 'ust_idnr'       => $this->ust_idnr ? $this->ust_idnr : null,
                 'passport_no'   => $this->passport_no ? $this->passport_no : null,
                 'passport_expiry' => $this->passport_expiry ? $this->passport_expiry : null,
                 'passport_picture' => $this->uploadedPassportPicture ? $this->uploadedPassportPicture->store('passports', 'public') : $this->passport_picture,

@@ -281,7 +281,7 @@
                                             <div class="card shadow-none">
                                                 <div class="card-header">
                                                     <div class="row flex-between-center">
-                                                        <div class="col-auto">Images / Videos</div>
+                                                        <div class="col-auto">Optional products</div>
                                                         <div class="col-auto">
                                                             <button class="btn btn-sm btn-primary" type="button"
                                                                 data-toggle="modal" id="productAddModalButton">Add

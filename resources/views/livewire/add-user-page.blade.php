@@ -248,12 +248,12 @@
                                         <input type="text" wire:model="iban" id="iban" class="form-control"
                                             placeholder="Iban" />
                                     </div>
-                                    <div class="col-sm-12 col-md-4 col-lg-4">
+                                    {{-- <div class="col-sm-12 col-md-4 col-lg-4">
                                         <label class="form-label" for="ust_idnr"><b>USt-IdNr:</b></label>
                                         <input type="text" wire:model="ust_idnr" id="ust_idnr"
                                             class="form-control @error('ust_idnr') is-invalid @enderror"
                                             placeholder="Enter USt-IdNr">
-                                    </div>
+                                    </div> --}}
 
                                     <div class="col-sm-12 col-md-4 col-lg-4">
                                         <label class="form-label" for="passport_no"><b>Passport no:</b></label>

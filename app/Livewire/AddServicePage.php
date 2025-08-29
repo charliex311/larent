@@ -67,7 +67,7 @@ class AddServicePage extends Component
     {
         $this->row = Service::find($request->id);
         $this->optionalProducts = $this->row ? $this->row->optionalProducts : [];
-        $this->products = Optionalproduct::whereNotIn('id', $this->optionalProducts->pluck('optional_product_id') ?? [])->get();
+        $this->products = $this->row ? Optionalproduct::whereNotIn('id', $this->optionalProducts?->pluck('optional_product_id') ?? [])->get() : [];
 
         $this->title       = $this->row ? $this->row->title : $this->title;
         $this->unit        = $this->row ? $this->row->unit : $this->unit;
@@ -116,7 +116,7 @@ class AddServicePage extends Component
         if ($this->price && $this->tax) {
             $percentage = doubleval($this->tax) / 100;
             $this->tax_value = number_format($percentage * doubleval($this->price), 2);
-            $this->total_price = $this->tax_value ? doubleval($this->tax_value) + doubleval($this->price) : 0;
+            $this->total_price = $this->tax_value ? number_format(doubleval($this->tax_value) + doubleval($this->price), 2) : 0;
         } else {
             $this->reset(['tax_value','total_price']);
         }
