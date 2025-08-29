@@ -67,7 +67,7 @@ class AddServicePage extends Component
     {
         $this->row = Service::find($request->id);
         $this->optionalProducts = $this->row ? $this->row->optionalProducts : [];
-        $this->products = Optionalproduct::whereNotIn('id', $this->optionalProducts->pluck('optional_product_id'))->get();
+        $this->products = Optionalproduct::whereNotIn('id', $this->optionalProducts->pluck('optional_product_id') ?? [])->get();
 
         $this->title       = $this->row ? $this->row->title : $this->title;
         $this->unit        = $this->row ? $this->row->unit : $this->unit;
