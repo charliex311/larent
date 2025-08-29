@@ -66,12 +66,8 @@ class AddNewServices extends Component
 
     public function delete($id)
     {
-        $service = Service::find($id);
-        if ($service) {
-            $service->update([
-                'user_id' => null,
-                'secondarycontact_id' => null,
-            ]);
+        if ($this->row) {
+            $this->row->services()->find($id)?->delete();
             session()->flash('success', 'Removed Successfully.');
         }
         return $this->redirect('/admin/add-new-services?id='.$this->row->id.'&&type='.$this->role, navigate:true);

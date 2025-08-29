@@ -9,9 +9,11 @@
         <a href="/admin/add-address?id={{ $row->id }}&&type={{ Str::ucfirst($role) }}"
             class="btn btn-falcon-light btn-sm {{ Route::currentRouteName() == 'add-addresses' ? 'bg-white' : '' }} border">Address</a>
 
+        @if ($row->hasRole('Employee'))
             <a href="{{ route('add-salary', ['user_id' => $row->id]) }}"
-            class="btn btn-falcon-light btn-sm {{ Route::currentRouteName() == 'add-salary' ? 'bg-white' : '' }} border">Salary</a>
-
+                class="btn btn-falcon-light btn-sm {{ Route::currentRouteName() == 'add-salary' ? 'bg-white' : '' }} border">Salary
+                history</a>
+        @endif
 
         <a href="/admin/add-social-links?id={{ $row->id }}&&type={{ Str::ucfirst($role) }}"
             class="btn btn-falcon-light btn-sm {{ Route::currentRouteName() == 'add-social-links' ? 'bg-white' : '' }} border">Social
