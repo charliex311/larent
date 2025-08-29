@@ -276,7 +276,7 @@
                                             placeholder="Enter Passport picture">
 
                                             @if($passport_picture)
-                                                <a href="{{ Storage::disk('public')->url($passport_picture) }}" class="" wire:loading.remove wire:target='uploadedPassportPicture'>View passport picture</a>
+                                                <a href="{{ Storage::disk('public')->url($passport_picture) }}" class="" wire:loading.remove wire:target='uploadedPassportPicture' target="_blank">View passport picture</a>
                                             @endif
                                             <div class="" wire:loading wire:target='uploadedPassportPicture'>Uploading picture....</div>
                                     </div>
