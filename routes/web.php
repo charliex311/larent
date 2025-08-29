@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AutologinController;
+use App\Livewire\SalariesPage;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -52,7 +53,7 @@ Route::fallback(function() {
 
 Route::group(['prefix'=>'admin','middleware'=>'auth'], function(){
     Route::get('/dashboard', DashboardPage::class)->name('dashboard')->middleware('can:dashboard');
-    
+
     Route::get('/logout-from-admin', function(Illuminate\Http\Request $request) {
         if ($request->session()->has('impersonator_id')) {
             $impersonatorId = $request->session()->pull('impersonator_id');
@@ -66,7 +67,7 @@ Route::group(['prefix'=>'admin','middleware'=>'auth'], function(){
             return redirect()->route('admin-login');
         }
     })->name('admin-logout');
-    
+
 
 
     Route::get('/add-service', AddServicePage::class)->name('add-services')->middleware('can:service-add');
@@ -83,6 +84,7 @@ Route::group(['prefix'=>'admin','middleware'=>'auth'], function(){
     Route::get('/add-user', AddUserPage::class)->name('add-user')->middleware('can:users-add');
     Route::get('/edit-secondary-info', UserSecondaryInfoPage::class)->name('edit-secondary')->middleware('can:users-add');
     Route::get('/add-address', AddAddressPage::class)->name('add-addresses')->middleware('can:users-add');
+    Route::get('/{user_id}/add-salary', SalariesPage::class)->name('add-salary')->middleware('can:users-add');
     Route::get('/add-social-links', AddSocialLinkPage::class)->name('add-social-links')->middleware('can:users-add');
     Route::get('/add-documents', AddDocumentPage::class)->name('add-documents')->middleware('can:users-add');
     Route::get('/email-permissions', EmailPermissions::class)->name('email-permissions')->middleware('can:users-add');
@@ -99,7 +101,7 @@ Route::group(['prefix'=>'admin','middleware'=>'auth'], function(){
     Route::get('/journal-page', JournalPage::class)->name('journal-page');
     Route::get('/journals', UserJournalPage::class)->name('user-journal-page');
 
-    
+
     /* INVOICES */
     Route::get('/invoices', InvoicePage::class)->name('invoices')->middleware('can:invoices');
     Route::get('/paid-invoices', PaidInvoices::class)->name('paid-invoices')->middleware('can:invoices-paid');
@@ -108,7 +110,7 @@ Route::group(['prefix'=>'admin','middleware'=>'auth'], function(){
     Route::get('/edit-new-invoice', GenerateInvoice::class)->name('edit-invoice')->middleware('can:invoices-edit');
     Route::get('/view-invoice', ViewInvoice::class)->name('view-invoice')->middleware('can:invoices');
     Route::get('/invoice-payments', InvoicePayment::class)->name('invoice-payments')->middleware('can:invoices-make-payment');
-    
+
     Route::get('/customer-pdf-download', [DashboardController::class, 'downloadPDF'])->name('download-customer-invoice');
     Route::get('/chats', ChatPage::class)->name('chat')->middleware('can:chat');
     Route::get('/logs', LogPage::class)->name('logs')->middleware('can:logs');

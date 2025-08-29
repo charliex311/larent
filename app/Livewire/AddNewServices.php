@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\CustomerHasService;
 use Livewire\Component;
 use App\Models\User;
 use App\Models\Service;
@@ -39,9 +40,7 @@ class AddNewServices extends Component
         $this->validate(['service_id' => 'required'],['service_id.required' => 'Select Service']);
         $service = Service::find($this->service_id);
         if ($service) {
-            $service->update([
-                'user_id' => $this->row->id,
-            ]);
+            $this->row->services()->updateOrCreate(['service_id' => $this->service_id, 'user_id' => $this->row->id], ['service_id' => $this->service_id, 'user_id' => $this->row->id]);
             session()->flash('success', 'Service Added Successfully.');
             return $this->redirect('/admin/add-new-services?id='.$this->row->id.'&&type='.$this->role, navigate:true);
         }
@@ -80,14 +79,16 @@ class AddNewServices extends Component
 
     public function render()
     {
-        $data['lists'] = Service::latest()
-        ->when($this->keyword, function($query, $keyword){
-            return $query->where('title', 'LIKE', '%'.$keyword.'%')
-            ->orWhere('unit', 'LIKE', '%'.$keyword.'%');
+        $data['lists'] = CustomerHasService::latest()
+        ->whereHas('service', function($query) {
+            return $query->where('title', 'LIKE', '%'.$this->keyword.'%')
+            ->orWhere('unit', 'LIKE', '%'.$this->keyword.'%');
         })
-        ->where('user_id', $this->row->id)
+        ->whereHas('customer', function($query) {
+            $query->where('id', $this->row->id);
+        })
         ->paginate(25);
-        $data['services'] = Service::where('user_id', NULL)->get();
+        $data['services'] = Service::where('status', true)->whereNotIn('id', $this->row->services()->pluck('service_id'))->get();
         $data['contact_persons'] = Secondarycontact::where('user_id', $this->row->id)->get();
         return view('livewire.add-new-services', $data);
     }

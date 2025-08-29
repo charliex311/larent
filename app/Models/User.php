@@ -15,7 +15,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
     use SoftDeletes;
     use HasRoles;
-    
+
     protected $fillable = [
         'photo',
         'first_name',
@@ -31,16 +31,20 @@ class User extends Authenticatable
         'country',
         'nationality',
         'pop_id',
-        'block_reason'
+        'block_reason',
+        'whatsapp_id',
+        'botsailor_id',
+        'telegram_id',
+        'company_name'
     ];
-    
+
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
     protected $dates = ['deleted_at'];
-    
+
     protected $casts = [
         'date_of_birth' => 'datetime',
         'email_verified_at' => 'datetime',
@@ -56,5 +60,13 @@ class User extends Authenticatable
     public function customertransactions()
     {
         return $this->hasMany(Customertransaction::class);
+    }
+
+    function salaries() {
+        return $this->hasMany(SalaryHistory::class);
+    }
+
+    function services() {
+        return $this->hasMany(CustomerHasService::class, 'user_id', 'id');
     }
 }

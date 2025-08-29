@@ -18,13 +18,13 @@
                         </div>
                         <div class="border-bottom border-200 my-3"></div>
                         <div class="d-flex align-items-center justify-content-between justify-content-lg-end px-x1">
-                            
+
                             <div class="row flex-between-center">
                                 <div class="col-auto pe-0">
                                     <h6 class="mb-0"></h6>
                                 </div>
                                 <div class="col-auto">
-                                    
+
                                 </div>
                             </div>
                             <div class="bg-300 mx-3 d-none d-lg-block" style="width:1px; height:29px"></div>
@@ -62,7 +62,7 @@
                                 @foreach($active_users as $item)
                                 <tr class="btn-reveal-trigger">
                                     <td>{{ $item->id }}</td>
-                                    <td class="text-center">{{ $item->first_name.' '.$item->last_name }}</td>
+                                    <td class="text-center">{{ fullName($item->id) }}</td>
                                     <td class="text-center">{{ $item->phone }}</td>
                                     <td class="text-center">{{ $item->email }}</td>
                                     @if($rolename == 'Employee')
@@ -93,7 +93,7 @@
                                                     <a class="dropdown-item text-warning" href="/admin/impersonate/{{$item->id}}?type={{Str::ucfirst($rolename)}}" > <span class="fe fe-lock"></span> Auto Login </a>
 
                                                     @if(role_name($item->id) != 'Administrator')
-                                                    <a class="dropdown-item" href="#!" wire:click="changeStatus({{$item->id}})"> 
+                                                    <a class="dropdown-item" href="#!" wire:click="changeStatus({{$item->id}})">
                                                         <span class="fe fe-slash"></span> Mark as {{user_status($item->id) == 'Inactive' ? 'Active' : 'Inactive'}}
                                                     </a>
                                                     @endif
@@ -125,7 +125,7 @@
                                     <h6 class="mb-0"></h6>
                                 </div>
                                 <div class="col-auto">
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -184,7 +184,7 @@
                                                     @endcan
                                                     <a class="dropdown-item text-warning" href="#!" > <span class="fe fe-lock"></span> Auto Login</a>
                                                     @if(role_name($inactitem->id) != 'Administrator')
-                                                    <a class="dropdown-item" href="#!" wire:click="changeStatus({{$inactitem->id}})"> 
+                                                    <a class="dropdown-item" href="#!" wire:click="changeStatus({{$inactitem->id}})">
                                                         <span class="fe fe-slash"></span> Mark as {{user_status($inactitem->id) == 'Inactive' ? 'Active' : 'Inactive'}}
                                                     </a>
                                                     @endif

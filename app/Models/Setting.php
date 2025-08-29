@@ -27,7 +27,14 @@ class Setting extends Model
         'business_number',
         'fiscal_number',
         'note_for_email',
-        'email_premissions'
+        'email_premissions',
+        'passport_no',
+        'passport_expiry',
+        'passport_picture'
+    ];
+
+    protected $casts = [
+        'passport_expiry' => 'date',
     ];
 
     public function user()

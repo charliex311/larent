@@ -11,11 +11,11 @@
                                 <div class="col-auto"><b>{{$row ? 'Update ' : 'Add New '}} {{$role}}</b></div>
                                 <div class="col-auto"><h3>{{ $row ? '('.fullName($row->id).')' : ''}}</h3></div>
                                 <div class="col-auto">
-                                    <button type="button" data-bs-toggle="modal" 
-                                    data-bs-target="#addDocumentModal" 
-                                    wire:click="cleanFields" 
+                                    <button type="button" data-bs-toggle="modal"
+                                    data-bs-target="#addDocumentModal"
+                                    wire:click="cleanFields"
                                     class="btn btn-falcon-primary btn-sm"><i class="fe fe-plus-circle"></i> Add</button>
-                                    
+
                                     <a href="/admin/users?type={{$role}}" class="btn btn-primary btn-sm">Back</a>
                                 </div>
                             </div>
@@ -56,7 +56,7 @@
         <div class="modal fade" id="addDocumentModal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-md" role="document">
                 <div class="modal-content position-relative">
-                    
+
                     <div class="position-absolute top-0 end-0 mt-2 me-2 z-1">
                         <button type="button" class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -64,7 +64,7 @@
                         <div class="rounded-top-3 py-3 ps-4 pe-6 bg-light">
                             <h4 class="mb-1" id="modalExampleDemoLabel">{{ $info ? 'Edit' : 'Add New' }}</h4>
                         </div>
-                        <div class="p-4 pb-0">                            
+                        <div class="p-4 pb-0">
 
                             <div class="mb-3">
                                 <label class="col-form-label" for="name">Title :</label>
@@ -77,14 +77,23 @@
                                 <input class="form-control @error('file') is-invalid @enderror" id="file" type="file" wire:model="file" placeholder="file" />
                             </div>
                             @endif
-                            
+
+                            <div class="mb-3">
+                                <label class="col-form-label" for="issue_date">Issue date :</label>
+                                <input type="date" class="form-control @error('issue_date') is-invalid @enderror" id="issue_date" wire:model="issue_date" type="text" placeholder="Issue date" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="col-form-label" for="name">Expiry date :</label>
+                                <input type="date" class="form-control @error('expiry_date') is-invalid @enderror" id="expiry_date" wire:model="expiry_date" type="text" placeholder="Expiry date" />
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
                         <button class="btn btn-primary" type="button" wire:click='saveChanges'> {{ $info ? 'Save Changes' : 'Save' }} </button>
                     </div>
-                        
+
 
                 </div>
             </div>

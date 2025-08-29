@@ -13,9 +13,12 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\Rules\Password;
+use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 class AddUserPage extends Component
 {
+
+    use WithFileUploads;
 
     public $first_name;
     public $last_name;
@@ -42,6 +45,9 @@ class AddUserPage extends Component
     public $business_number;
     public $fiscal_number;
 
+    public $whatsapp_id = null;
+    public $botsailor_id = null;
+    public $telegram_id = null;
 
     public $row;
 
@@ -54,6 +60,16 @@ class AddUserPage extends Component
     public $access_mode='Unblocked';
     public $blocking_reason;
 
+    public $company_name = null;
+
+    public $passport_no = null;
+    public $passport_expiry = null;
+    public $passport_picture = null;
+    public $uploadedPassportPicture = null;
+    public $uploadedProfile = null;
+
+    public $photo = null;
+
     public function mount(Request $request)
     {
         $this->row            = User::withTrashed()->find($request->id) ? User::withTrashed()->find($request->id) : null;
@@ -65,6 +81,12 @@ class AddUserPage extends Component
         $this->role           = $request->type;
         $this->customer_type  = $this->row ? $this->row->customer_type : $this->customer_type;
         $this->permissionname = collect([]);
+
+        $this->whatsapp_id    = $this->row ? $this->row->whatsapp_id : $this->whatsapp_id;
+        $this->botsailor_id   = $this->row ? $this->row->botsailor_id : $this->botsailor_id;
+        $this->telegram_id    = $this->row ? $this->row->telegram_id : $this->telegram_id;
+
+        $this->company_name = $this->row ? $this->row->company_name : $this->company_name;
 
         if (!empty($this->row)) {
             $this->permissionname   = collect([]);
@@ -89,6 +111,10 @@ class AddUserPage extends Component
         $this->ust_idnr        = $this->row && $this->row->setting ? $this->row->setting->ust_idnr : $this->ust_idnr;
         $this->business_number = $this->row && $this->row->setting ? $this->row->setting->business_number : $this->business_number;
         $this->fiscal_number   = $this->row && $this->row->setting ? $this->row->setting->fiscal_number : $this->fiscal_number;
+        $this->passport_no     = $this->row && $this->row->setting ? $this->row->setting->passport_no : $this->passport_no;
+        $this->passport_expiry = $this->row && $this->row->setting ? $this->row->setting->passport_expiry?->format('Y-m-d') : $this->passport_expiry;
+        $this->passport_picture = $this->row && $this->row->setting ? $this->row->setting->passport_picture : $this->passport_picture;
+        $this->photo           = $this->row ? $this->row->photo : $this->photo;
 
         if (role_name(Auth::id()) == 'Administrator' || role_name(Auth::id()) == 'administrator') {
             if ($this->row) {
@@ -99,8 +125,18 @@ class AddUserPage extends Component
 
     }
 
+
+    function updatedCustomerType() {
+        if($this->customer_type == 'Company') {
+            $this->first_name = null;
+            $this->last_name = null;
+        }else{
+            $this->company_name = null;
+        }
+    }
+
     public function addRole()
-    { 
+    {
         $this->validate(['customer_role_name' => 'required'], ['customer_role_name.required' => 'Enter Role Name.']);
         $role = Role::where('name',$this->customer_role_name)->first() ?? null;
         if (!$role) {
@@ -151,16 +187,17 @@ class AddUserPage extends Component
 
     public function saveChanges()
     {
-        
         $this->validate(
             [
-                'first_name' => 'required',
-                'last_name'  => 'required',
+                'first_name' => 'required_without:company_name',
+                'last_name'  => 'required_without:company_name',
                 'email'      => 'required',
                 'phone'      => 'required',
                 'role'       => 'required',
-                'customer_type' => 'required_if:role,=,Customer',
-            ], 
+                'customer_type' => 'required_if:role,Customer',
+                'company_name' => 'required_if:customer_type,Company',
+                'uploadedPassportPicture' => 'nullable|image',
+            ],
 
             [
                 'first_name.required' => 'Enter First Name.',
@@ -175,8 +212,9 @@ class AddUserPage extends Component
         $customerType = $this->customer_type ? $this->customer_type : NULL;
         $message = '';
         $url = '';
-        
+
         if ($this->row) {
+            $oldHourlyRate = $this->row->setting ? $this->row->setting->hourly_rate : 0;
             $this->resetValidation('password');
             $this->row->update([
                 'first_name'     => $this->first_name,
@@ -191,9 +229,12 @@ class AddUserPage extends Component
                 'city'          => $this->city ? $this->city : null,
                 'country'       => $this->country ? $this->country : null,
                 'nationality'   => $this->nationality ? $this->nationality : null,
+                'whatsapp_id'   => $this->whatsapp_id ? $this->whatsapp_id : null,
+                'botsailor_id'  => $this->botsailor_id ? $this->botsailor_id : null,
+                'telegram_id'   => $this->telegram_id ? $this->telegram_id : null,
+                'company_name'  => $this->company_name ? $this->company_name : null,
+                'photo' => $this->uploadedProfile ? $this->uploadedProfile->store('profiles', 'public') : $this->photo,
             ]);
-
-
 
             $this->row->setting->update([
                 'note_for_email' => $this->notes ? $this->notes : null,
@@ -203,7 +244,20 @@ class AddUserPage extends Component
                 'iban'           => $this->iban ? $this->iban : null,
                 'bic'            => $this->bic ? $this->bic : null,
                 'ust_idnr'       => $this->ust_idnr ? $this->ust_idnr : null,
+                'passport_no'   => $this->passport_no ? $this->passport_no : null,
+                'passport_expiry' => $this->passport_expiry ? $this->passport_expiry : null,
+                'passport_picture' => $this->uploadedPassportPicture ? $this->uploadedPassportPicture->store('passports', 'public') : $this->passport_picture,
             ]);
+
+            if($this->row->setting && $this->row->setting->hourly_rate != $oldHourlyRate){
+                $this->row->salaries()->update(['is_current' => false]);
+                $this->row->salaries()->create([
+                    'amount' => $this->row->setting->hourly_rate,
+                    'effective_date' => now(),
+                    'is_current' => true,
+                    'currency' => $this->row->setting->currency
+                ]);
+            }
 
             /*first removing all roles from the user*/
             foreach($this->row->roles as $item){
@@ -211,7 +265,7 @@ class AddUserPage extends Component
                     $this->row->removeRole($item);
                 }
             }
-            // assign role 
+            // assign role
             if($this->row->id != 1){
                 $this->row->assignRole($this->role);
             }
@@ -251,10 +305,14 @@ class AddUserPage extends Component
                     'city'           => $this->city ? $this->city : null,
                     'country'        => $this->country ? $this->country : null,
                     'nationality'    => $this->nationality ? $this->nationality : null,
+                    'whatsapp_id'    => $this->whatsapp_id ? $this->whatsapp_id : null,
+                    'botsailor_id'   => $this->botsailor_id ? $this->botsailor_id : null,
+                    'telegram_id'    => $this->telegram_id ? $this->telegram_id : null,
+                    'company_name'   => $this->company_name ? $this->company_name : null,
                 ]);
-                
+
                 if ($user) {
-                    
+
 
                     if ($this->role == 'Customer') {
                         $user->givePermissionTo([
@@ -272,7 +330,7 @@ class AddUserPage extends Component
                     if ($this->role == 'Employee') {
                         $user->givePermissionTo([
                             'chat',
-                            'dashboard', 
+                            'dashboard',
                             'settings-update',
                             'settings-upload-documents',
                             'settings-view',
@@ -283,7 +341,7 @@ class AddUserPage extends Component
                     if ($this->role == 'Manager') {
                         $user->givePermissionTo([
                             'chat',
-                            'dashboard', 
+                            'dashboard',
                             'settings-update',
                             'settings-upload-documents',
                             'settings-view'
@@ -306,7 +364,7 @@ class AddUserPage extends Component
 
                     $url = '/admin/users?type='.Str::ucfirst($this->role);
                 }
-                
+
                 $message = 'Created.';
             } else {
                 $this->addError('password','Enter password.');

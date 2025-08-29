@@ -24,6 +24,10 @@ class AddDocumentPage extends Component
     public $file;
     public $usrid;
 
+    public $issue_date = null;
+
+    public $expiry_date = null;
+
     public function mount(Request $request)
     {
         $this->usrid = $request->id;
@@ -36,6 +40,8 @@ class AddDocumentPage extends Component
         $this->cleanFields();
         $this->info = Docverify::find($id);
         $this->name = $this->info ? $this->info->type : $this->name;
+        $this->issue_date = $this->info ? $this->info->issue_date?->format('Y-m-d') : $this->issue_date;
+        $this->expiry_date = $this->info ? $this->info->expiry_date?->format('Y-m-d') : $this->expiry_date;
     }
 
     public function delete($id)
@@ -76,6 +82,8 @@ class AddDocumentPage extends Component
             $this->info->update([
                 'type' => $this->name,
                 'file' => $filename,
+                'issue_date' => $this->issue_date,
+                'expiry_date' => $this->expiry_date,
             ]);
             $type = 'close_document_modal';
             $message = 'Updated Successfully.';
@@ -84,6 +92,8 @@ class AddDocumentPage extends Component
                 'user_id' => $this->row->id,
                 'type' => $this->name,
                 'file' => $filename,
+                'issue_date' => $this->issue_date,
+                'expiry_date' => $this->expiry_date,
             ]);
             $type = 'close_document_modal';
             $message = 'Uploaded Successfully.';

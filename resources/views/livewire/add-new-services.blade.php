@@ -55,25 +55,25 @@
                                 <tbody class="list" id="table-ticket-body">
                                     @foreach($lists as $item)
                                     <tr class="btn-reveal-trigger">
-                                        <td class="align-middle fs-0 py-1">{{ $item->id }}</td>
-                                        <td class="align-middle subject py-1 pe-1">{{ $item->title }}</td>
-                                        <td class="align-middle subject py-1 pe-1">{{ $item->unit }}</td>
+                                        <td class="align-middle fs-0 py-1">{{ $loop->iteration }}</td>
+                                        <td class="align-middle subject py-1 pe-1">{{ $item->service->title }}</td>
+                                        <td class="align-middle subject py-1 pe-1">{{ $item->service->unit }}</td>
                                         <td class="align-middle subject py-1 pe-1">
-                                            <span class="badge rounded-pill badge-subtle-primary">{{ priceFormat($item->currency, $item->price) }}</span>
+                                            <span class="badge rounded-pill badge-subtle-primary">{{ priceFormat($item->service->currency, $item->service->price) }}</span>
                                         </td>
                                         <td class="align-middle subject py-1 pe-1">
-                                            <span class="badge rounded-pill badge-subtle-warning">{{ $item->tax.'%' }}</span>
+                                            <span class="badge rounded-pill badge-subtle-warning">{{ $item->service->tax.'%' }}</span>
                                         </td>
                                         <td class="align-middle subject py-1 pe-1">
-                                            <span class="badge rounded-pill badge-subtle-success">{{ priceFormat($item->currency, $item->total_price) }}</span>
+                                            <span class="badge rounded-pill badge-subtle-success">{{ priceFormat($item->service->currency, $item->service->total_price) }}</span>
                                         </td>
-                                        <td class="align-middle subject py-1 pe-1"> {{ $item->secondarycontact_id ? contactPersonName($item->secondarycontact_id) : 'N/A' }} </td>
+                                        <td class="align-middle subject py-1 pe-1"> {{ $item->service->secondarycontact_id ? contactPersonName($item->service->secondarycontact_id) : 'N/A' }} </td>
                                         <td class="align-middle subject py-1 pe-1 text-end">
                                             <div class="dropdown font-sans-serif position-static">
                                                 <button class="btn btn-link text-600 btn-sm dropdown-toggle btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false"><span class="fas fa-ellipsis-h fs--1"></span></button>
                                                 <div class="dropdown-menu dropdown-menu-end border py-0">
                                                     <div class="py-2">
-                                                        
+
                                                         <a class="dropdown-item fs-1" href="#!" data-bs-toggle="modal" data-bs-target="#addContactPerson" wire:click="selectedRow({{$item->id}})">
                                                             <span class="fe fe-edit-3"></span> Add/Edit Contact Person
                                                         </a>
@@ -81,8 +81,8 @@
                                                         <a class="dropdown-item fs-1" href="#!" onclick="return confirm('Are you sure you want to delete?') || event.stopImmediatePropagation()" wire:click="delete({{$item->id}})">
                                                             <span class="fe fe-trash"></span> Delete
                                                         </a>
-                                                        
-                                                    </div> 
+
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>

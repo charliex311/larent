@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Optionalproduct;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Http\Request;
@@ -57,14 +58,21 @@ class AddServicePage extends Component
     public $media_caption;
 
 
+    public $products = [];
+    public $choosenProduct = null;
+    public $optionalProducts = [];
+
+
     public function mount(Request $request)
     {
         $this->row = Service::find($request->id);
+        $this->optionalProducts = $this->row ? $this->row->optionalProducts : [];
+        $this->products = Optionalproduct::whereNotIn('id', $this->optionalProducts->pluck('optional_product_id'))->get();
 
         $this->title       = $this->row ? $this->row->title : $this->title;
         $this->unit        = $this->row ? $this->row->unit : $this->unit;
         $this->price       = $this->row ? $this->row->price : $this->price;
-        $this->currency    = $this->row ? $this->row->currency : $this->currency; 
+        $this->currency    = $this->row ? $this->row->currency : $this->currency;
         $this->tax         =  $this->row ? $this->row->tax : $this->tax; //globalTax();
         $this->tax_value   = $this->row ? $this->row->tax_value : $this->tax_value;
         $this->total_price = $this->row ? $this->row->total_price : $this->total_price;
@@ -101,7 +109,7 @@ class AddServicePage extends Component
         $this->upload_id      = $this->row ? $this->row->upload_id: $this->upload_id;
     }
 
-    
+
 
     public function triggerCalTaxVal()
     {
@@ -156,12 +164,12 @@ class AddServicePage extends Component
             ]
         );
 
-        
+
 
         $message ='';
         $status = '';
 
-        $serviceID = $this->row ? $this->row->id : NULL; 
+        $serviceID = $this->row ? $this->row->id : NULL;
 
         $status = role_name(Auth::user()->id) == 'Administrator' ? $this->status : 1;
 
@@ -171,7 +179,7 @@ class AddServicePage extends Component
                 'title'        => $this->title,
                 'unit'         => $this->unit,
                 'price'        => $this->price ? $this->price : 0.000,
-                'currency'     => $this->currency ?? NULL, 
+                'currency'     => $this->currency ?? NULL,
                 'tax'          => $this->tax && $this->price ? $this->tax : 0.000,
                 'tax_value'    => $this->tax_value ? $this->tax_value : 0.000,
                 'total_price'  => $this->total_price ? $this->total_price : 0.000,
@@ -193,7 +201,7 @@ class AddServicePage extends Component
                 'title'        => $this->title,
                 'unit'         => $this->unit,
                 'price'        => $this->price ? $this->price : 0.000,
-                'currency'     => $this->currency ?? NULL, 
+                'currency'     => $this->currency ?? NULL,
                 'tax'          => $this->tax && $this->price ? $this->tax : 0.000,
                 'tax_value'    => $this->tax_value ? $this->tax_value : 0.000,
                 'total_price'  => $this->total_price ? $this->total_price : 0.000,
@@ -225,7 +233,7 @@ class AddServicePage extends Component
                 $extension      = $file->getClientOriginalExtension();
                 $uniqueFileName = uniqid() . '.' . $extension;
                 $remotePath     = 'uploads/' . $uniqueFileName;
-    
+
                 // Prepare files to send to the API
                 $filesData[] = [
                     'path' => $remotePath,
@@ -233,10 +241,10 @@ class AddServicePage extends Component
                     'name' => $uniqueFileName
                 ];
             }
-    
+
             // Flatten the array for multipart request
             $multipartData = [];
-    
+
             foreach ($filesData as $fileData) {
                 $multipartData[] = [
                     'name'     => 'files[]',
@@ -244,7 +252,7 @@ class AddServicePage extends Component
                     'filename' => $fileData['name'],
                     'id'       => $uploadId,
                 ];
-    
+
                 // Add the upload ID as a regular form field
                 $multipartData[] = [
                     'name'     => 'upload_id',
@@ -256,7 +264,7 @@ class AddServicePage extends Component
                     'contents' => $this->media_caption
                 ];
             }
-            
+
             Http::async()->asMultipart()->post($sending_url, $multipartData)->wait();
         }
 
@@ -284,6 +292,32 @@ class AddServicePage extends Component
         return redirect()->to('admin/services');
     }
 
+    function saveProductForService() {
+        $this->validate(['choosenProduct' => 'required|exists:optionalproducts,id'], ['choosenProduct.required' => 'Please choose a product', 'choosenProduct.exists' => 'Selected product does not exist']);
+
+        if($this->row && $this->choosenProduct && $this->products->find($this->choosenProduct)){
+            $this->row->optionalProducts()->updateOrCreate([
+                'service_id' => $this->row->id,
+                'optional_product_id' => $this->choosenProduct
+            ], [
+                'service_id' => $this->row->id,
+                'optional_product_id' => $this->choosenProduct
+            ]);
+
+            $this->optionalProducts = $this->row ? $this->row->optionalProducts : [];
+            $this->products = Optionalproduct::whereNotIn('id', $this->optionalProducts->pluck('optional_product_id'))->get();
+
+            $this->choosenProduct = null;
+        }
+    }
+
+    function deleteOptionalProduct($id) {
+        if($this->optionalProducts && $this->optionalProducts->find($id)) {
+            $this->optionalProducts->find($id)->delete();
+            $this->optionalProducts = $this->row ? $this->row->optionalProducts : [];
+            $this->products = Optionalproduct::whereNotIn('id', $this->optionalProducts->pluck('optional_product_id'))->get();
+        }
+    }
 
     public function delete($index = null, $serviceID = null)
     {

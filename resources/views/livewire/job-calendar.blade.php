@@ -456,7 +456,7 @@
                 </div>
 
                 <div class="mb-3">
-                  <label class="col-form-label" for="new_service">Service Name: - {{ count($services)}}</label>
+                  <label class="col-form-label" for="new_service">Service Name:</label>
                   <select wire:model.live="new_service" id="new_service" class="form-select @error('new_service') is-invalid @enderror">
                     <option value="">Select Service</option>
                     @foreach( $services as $serv)

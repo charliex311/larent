@@ -137,11 +137,15 @@ function fullName($id)
     $name = '';
     $user = User::withTrashed()->find($id);
     if ($user) {
-        if ($user->first_name) {
-            $name = $user->first_name;
-        }
-        if ($user->last_name) {
-            $name = $name.' '.$user->last_name;
+        if($user->hasRole('Customer') && $user->customer_type == "Company"){
+            $name = $user->company_name ? $user->company_name : 'n/a';
+        }else{
+            if ($user->first_name) {
+                $name = $user->first_name;
+            }
+            if ($user->last_name) {
+                $name = $name . ' ' . $user->last_name;
+            }
         }
     }
     return $name;
@@ -449,18 +453,18 @@ function serviceAddress($id)
 {
 
     if (Auth::check()) {
-        
+
         $service = Service::find($id);
-    
+
         $address = '';
-    
+
         if ($service) {
             $address = $service->street ? $address.$service->street : $address;
             $address = $service->postal_code ? $address.', '.$service->postal_code : $address;
             $address = $service->city ? $address.', '.$service->city : $address;
             $address = $service->country ? $address.', '.$service->country.'.' : $address;
         }
-    
+
         return $address;
 
     }
@@ -470,7 +474,7 @@ function serviceUnit($id)
 {
 
     if (Auth::check()) {
-        
+
         $service = Service::find($id);
         $unit = '';
         if ($service) {
@@ -485,7 +489,7 @@ function servicePrice($id)
 {
 
     if (Auth::check()) {
-        
+
         $service = Service::find($id);
         $price = 0;
         if ($service) {
@@ -530,16 +534,16 @@ function otherAddres($id)
     if (Auth::check()) {
 
         $data = Address::find($id);
-    
+
         $address = '';
-    
+
         if ($data) {
             $address = $data->street ? $address.$data->street : $address;
             $address = $data->postal_code ? $address.', '.$data->postal_code : $address;
             $address = $data->city ? $address.', '.$data->city : $address;
             $address = $data->country ? $address.', '.$data->country.'.' : $address;
         }
-    
+
         return $address;
     }
 }
@@ -615,7 +619,7 @@ function completedJob()
 function pendingJob()
 {
     if (Auth::check()) {
-        
+
         $user = Auth::user();
         $total = 0;
         $startOfMonth = Carbon::now()->startOfMonth(); // Get the start of the current month
@@ -666,7 +670,7 @@ function getTotalHour($jobID)
                     $initialTime->addHours($time2->hour)->addMinutes($time2->minute)->addSeconds($time2->second);
                 }
             }
-        
+
             // if work hour less than 2
             if (role_name(Auth::user()->id) == 'Customer') {
                 if ($initialTime->format('H') < 2) {
@@ -687,18 +691,18 @@ function getTotalHourReadable($jobID)
 
         $time = getTotalHour($jobID);
         $initialTime = Carbon::parse($time);
-        
-    
+
+
         $readable = '';
-    
+
         if ($initialTime->format('H') > 0) {
             $readable = '<b>'.$initialTime->format('g'). '</b>';
         }
-    
+
         if ($initialTime->format('i') > 0) {
             $readable = $readable.'.<b>'.$initialTime->format('i').'</b>';
         }
-    
+
         return $readable;
     }
 
@@ -740,7 +744,7 @@ function startDate($id)
                 }
             }
         }
-    
+
         return $date;
     }
 
@@ -761,7 +765,7 @@ function endDate($id)
                 }
             }
         }
-    
+
         return $date;
     }
 }
@@ -813,7 +817,7 @@ function textColor($name)
             if ($name == 'green') { $color = "white"; }
             if ($name == 'red') { $color = "white"; }
         }
-    
+
         return $color;
     }
 
@@ -897,7 +901,7 @@ function employeePhoto($userID)
         $photo = '';
         $user = User::find($userID) ?? NULL;
         if ($user) {
-    
+
             $defaultPhoto = 'https://ui-avatars.com/api/?name='.urlencode($user->first_name.' '.$user->first_name).'&color=ffffff&background=000000';
             if ($user->photo) {
                 if (file_exists(public_path('/').'storage/'.$user->photo)) {
@@ -932,7 +936,7 @@ function customerType($userID)
 {
 
     if (Auth::check()) {
-        
+
         $type = '';
         $user = User::find($userID) ?? NULL;
         if ($user) {
@@ -975,19 +979,19 @@ function customerBillingAddress($id)
         $generated = '';
         $address = Address::find($id) ?? NULL;
         if ($address) {
-    
+
             if ($address->street) {
                 $generated = $address->street;
             }
-    
+
             if ($address->postal_code) {
                 $generated = $generated.', '.$address->postal_code;
             }
-    
+
             if ($address->city) {
                 $generated = $generated.', '.$address->city;
             }
-    
+
             if ($address->country) {
                 $generated = $generated.', '.$address->country;
             }
@@ -1010,7 +1014,7 @@ function OptionalProductPriceOfJoblist($jobID=null)
     }
 }
 
-function calculateTotalBillAmount($hoursWorked, $hourlyRate, $jobID=null) 
+function calculateTotalBillAmount($hoursWorked, $hourlyRate, $jobID=null)
 {
     if (Auth::check()) {
 
@@ -1033,10 +1037,10 @@ function calculateTaxUsingCustomerPrice($jobID=null)
         if ($job) {
             $customer_price = calculateTotalBillAmount(getTotalHour($job->id), $job->hourly_rate, $jobID);
             $customer_price = doubleval($customer_price);
-    
+
             $tax = globalTax();
             $tax = doubleval($tax);
-    
+
             $reminder = $tax/100;
             $total_tax_value = $reminder*$customer_price;
         }
@@ -1051,7 +1055,7 @@ function currencySign($id=null)
         $setting = $id ? Setting::where('user_id',$id)->first() : Setting::where('user_id',1)->first();
         $currency = $setting ? $setting->currency : '';
     }
-    return $currency;  
+    return $currency;
 }
 
 function HourlyRateWithSign()
@@ -1086,7 +1090,7 @@ function HourlyRateInt()
 function totalEarning($userID)
 {
     if (Auth::check()) {
-        
+
         $amount = 0;
         $user = User::find($userID) ?? NULL;
         if ($user) {
@@ -1138,7 +1142,7 @@ function paymentDetails($userID)
 {
 
     if (Auth::check()) {
-        
+
         $user = User::find($userID);
         $data = [];
         if ($user && $user->setting) {
@@ -1278,7 +1282,7 @@ function last_invoice_number()
     }
 }
 
-function invoice_prefix($id) 
+function invoice_prefix($id)
 {
 
     if (Auth::check()) {
@@ -1364,21 +1368,21 @@ function checkMinimum2Hours($jobID)
 
         $time = getTotalHour($jobID);
         $newtime = Carbon::parse($time);
-    
+
         $readable = '';
-    
+
         if ($newtime->format('H') < 2) {
             $initialTime = Carbon::parse("00:00:00");
             $newtime = $initialTime->addHours(2);
-    
+
             if ($newtime->format('H') > 0) {
                 $readable = '<b>'.$newtime->format('g'). '</b> ';
             }
-    
+
             if ($newtime->format('i') > 0) {
                 $readable = $readable.'.<b>'.$newtime->format('i').'</b>';
             }
-    
+
             return $readable;
         } else {
             return getTotalHourReadable($jobID);
@@ -1393,7 +1397,7 @@ function checkMinimum2HoursPrice($jobID)
 
         $time = getTotalHour($jobID);
         $newtime = Carbon::parse($time);
-    
+
         if ($newtime->format('H') < 2) {
             //
         } else {
@@ -1859,7 +1863,7 @@ function calculatePrice($hourly_rate=0, $hour=0)
             list($hours, $minutes) = explode('.', $hour);
             $hours = doubleval($hours);
             $hours_in_minutes = $hours * 60;
-            $total_minutes = doubleval($minutes) + $hours_in_minutes; 
+            $total_minutes = doubleval($minutes) + $hours_in_minutes;
 
             $total_amount = ($minutely_rate * $total_minutes);
 
@@ -2111,7 +2115,7 @@ function uploadFTP($file=null)
     $name = '';
     if ($file) {
         $name = Storage::disk('ftp')->put('uploads', $file);
-        $name = ftpImage($name); 
+        $name = ftpImage($name);
     }
     return $name;
 }

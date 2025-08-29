@@ -15,7 +15,7 @@ class Service extends Model
         'title',
         'unit',
         'price',
-        'currency', 
+        'currency',
         'tax',
         'tax_value',
         'total_price',
@@ -46,4 +46,13 @@ class Service extends Model
 
 
     protected $dates = ['deleted_at'];
+
+
+    function optionalProducts() {
+        return $this->hasMany(ServicesHasOptionalProduct::class, 'service_id', 'id');
+    }
+
+    function customers() {
+        return $this->hasMany(CustomerHasService::class, 'service_id', 'id');
+    }
 }

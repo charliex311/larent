@@ -5,21 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Docverify extends Model
+class SalaryHistory extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'file',
-        'type',
-        'status',
-        'issue_date',
-        'expiry_date'
+        'amount',
+        'effective_date',
+        'is_current',
+        'currency'
     ];
 
     protected $casts = [
-        'issue_date' => 'date',
-        'expiry_date' => 'date',
+        'effective_date' => 'date',
     ];
 }

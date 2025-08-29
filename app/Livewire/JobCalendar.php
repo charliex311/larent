@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Taskfile;
 use App\Models\Task;
 use App\Models\Address;
+use App\Models\CustomerHasService;
 use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Auth;
@@ -780,13 +781,8 @@ class JobCalendar extends Component
         $data['optionalproducts'] = Optionalproduct::all();
         $data['customers'] = User::role('Customer')->get();
         $data['employees'] = User::role('Employee')->get();
-        $data['services'] = Service::when($this->customer, function($query, $customer){
-            return $query->where('user_id', $customer);
-        })
-        ->when($this->new_customer, function($query, $new_customer){
-            return $query->where('user_id', $new_customer);
-        })
-        ->where('status', 1)->get();
+
+        $data['services'] = CustomerHasService::with(['service'])->where('user_id', $this->new_customer)->get()->pluck('service');
         return view('livewire.job-calendar', $data);
     }
 }
