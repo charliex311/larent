@@ -27,6 +27,8 @@
                                         <tr>
                                             <th class="py-2 fs-0 pe-2">Title</th>
                                             <th class="sort align-middle ps-2" data-sort="file">File</th>
+                                            <th class="sort align-middle ps-2" data-sort="file">Issue date</th>
+                                            <th class="sort align-middle ps-2" data-sort="file">Expiry date</th>
                                             <th class="sort align-middle text-end" data-sort="agent">Actions</th>
                                         </tr>
                                     </thead>
@@ -34,7 +36,9 @@
                                         @foreach($lists as $item)
                                         <tr>
                                             <td class="align-middle fs-0 py-1">{{$item->type}}</td>
-                                            <td class="align-middle subject py-1 pe-1"><a href="{{$item->file}}" target="_blank">{{$item->file}}</a></td>
+                                            <td class="align-middle subject py-1 pe-1"><a href="{{Storage::disk('public')->url($item->file)}}" target="_blank">{{$item->file}}</a></td>
+                                            <td class="align-middle subject py-1 pe-1">{{ $item->issue_date?->format('d M, Y') }}</td>
+                                            <td class="align-middle subject py-1 pe-1">{{ $item->expiry_date?->format('d M, Y') }}</td>
                                             <td class="align-middle subject py-1 pe-1 text-end">
                                                 <div class="btn-group g-2">
                                                     <button type="button" data-bs-toggle="modal" data-bs-target="#addDocumentModal" wire:click="edit({{$item->id}})" class="btn btn-sm btn-falcon-primary rounded"><i class="fe fe-edit-3"></i></button>
